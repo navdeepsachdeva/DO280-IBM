@@ -1,0 +1,19 @@
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - deployment.yml
+  - service.yml
+  - route.yml
+
+configMapGenerator:
+  - name: cm-ibm
+    literals:
+      - database=redhat
+      - user=jeff
+
+secretGenerator:
+  - name: secret-ibm
+    literals:
+      - password=mypass@123
+      - root_password=r00tpa55@123

@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  creationTimestamp: null
+  name: recurrent-cron
+spec:
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+      name: recurrent-cron
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - command:
+            - date
+            - +%D-%X
+            image: registry.access.redhat.com/ubi9/httpd-24:9.7
+            name: recurrent-cron
+            resources: {}
+          restartPolicy: OnFailure
+  schedule: '*/1 6-23 * * 1-5'
+status: {}
+#  oc create cronjob recurrent-cron --schedule "*/1 6-23 * * 1-5" --dry-run=client -o yaml --image registry.access.redhat.com/ubi9/httpd-24:9.7 -- date +%D-%X   > recurrent-cron.yml

@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-app
+  labels:
+    app: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dev
+  template:
+    metadata:
+      name: jay-pod
+      labels:
+        app: dev
+    spec:
+      containers:
+        - name: web
+          image: registry.access.redhat.com/ubi9/httpd-24:9.7
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+
+        - name: db
+          image: registry.fedoraproject.org/f32/mysql
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-ibm
+                  key: user
+            - name: MYSQL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: cm-ibm
+                  key: database
+ 
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret-ibm
+                  key: password
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: secret-ibm
+                  key: root_password
+

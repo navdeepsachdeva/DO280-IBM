@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: borrow-app
+  name: borrow-app
+  namespace: project7
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: borrow-app
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: borrow-app
+    spec:
+      serviceAccountName: paul-borrow
+      containers:
+      - image: image-registry.openshift-image-registry.svc:5000/project5/php-app
+        name: php-app
+        resources: {}
+status: {}

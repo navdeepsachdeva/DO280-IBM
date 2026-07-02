@@ -1,0 +1,23 @@
+kind: Deployment
+metadata:
+  name: dev-app
+spec:
+  replicas: 4
+  template:
+    metadata:
+      name: jay-pod
+      labels:
+        env: test
+    spec:
+      containers:
+        - name: web
+          ports:
+            - containerPort: 8080
+            - containerPort: 8443
+          resources:
+            requests:
+              cpu: "10m"
+              memory: "20Mi"
+            limits:
+              cpu: "20m"
+              memory: "40Mi"

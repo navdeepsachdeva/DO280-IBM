@@ -1,0 +1,39 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dev-app
+  labels:
+    app: dev
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: dev
+  template:
+    metadata:
+      name: copy-app
+      labels:
+        app: dev
+    spec:
+      containers:
+        - name: web
+          image: registry.access.redhat.com/ubi9/httpd-24:9.7
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+
+        - name: db
+          image: registry.fedoraproject.org/f32/mysql
+          ports:
+            - containerPort: 3306
+          env: 
+            - name: MYSQL_USER
+              value: paul
+            - name: MYSQL_DATABASE
+              value: ibm
+            - name: MYSQL_PASSWORD
+              value: mypa55
+            - name: MYSQL_ROOT_PASSWORD
+              value: r00tpa55
+

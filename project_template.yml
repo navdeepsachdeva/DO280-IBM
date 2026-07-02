@@ -1,0 +1,116 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  creationTimestamp: null
+  name: project-request
+objects:
+
+- apiVersion: project.openshift.io/v1
+  kind: Project
+  metadata:
+    annotations:
+      openshift.io/description: ${PROJECT_DESCRIPTION}
+      openshift.io/display-name: ${PROJECT_DISPLAYNAME}
+      openshift.io/requester: ${PROJECT_REQUESTING_USER}
+    creationTimestamp: null
+    name: ${PROJECT_NAME}
+  spec: {}
+  status: {}
+
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    creationTimestamp: null
+    name: ${PROJECT_NAME}-ibm
+    namespace: ${PROJECT_NAME}
+  data:
+    password: bXlwYTU1
+    root_password: cjAwdHBhNTU=
+
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    creationTimestamp: null
+    name: ${PROJECT_NAME}-ibm
+    namespace: ${PROJECT_NAME}
+  data:
+    database: ibm
+    user: paul
+
+- apiVersion: v1
+  kind: ResourceQuota
+  metadata:
+    creationTimestamp: null
+    name: ${PROJECT_NAME}-count-quota
+    namespace: ${PROJECT_NAME}
+  spec:
+    hard:
+      count/configmaps: "4"
+      count/deployments.apps: "3"
+      count/pods: "6"
+      count/routes.route.openshift.io: "2"
+      count/secrets: "4"
+      count/services: "3"
+  status: {}
+
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    name: ${PROJECT_NAME}-pod
+    namespace: ${PROJECT_NAME}
+  spec:
+    containers:
+      - name: web
+        image: registry.access.redhat.com/ubi9/httpd-24:9.7
+        ports:
+          - containerPort: 8080
+            protocol: TCP
+          - containerPort: 8443
+   
+      - name: db
+        image: registry.fedoraproject.org/f32/mysql
+        ports:
+          - containerPort: 3306
+        env:
+          - name: MYSQL_USER
+            valueFrom:
+              configMapKeyRef:
+                name: ${PROJECT_NAME}-ibm
+                key: user
+          - name: MYSQL_DATABASE
+            valueFrom:
+              configMapKeyRef:
+                name: ${PROJECT_NAME}-ibm
+                key: database
+   
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: ${PROJECT_NAME}-ibm
+                key: password
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: ${PROJECT_NAME}-ibm
+                key: root_password
+
+- apiVersion: rbac.authorization.k8s.io/v1
+  kind: RoleBinding
+  metadata:
+    creationTimestamp: null
+    name: admin
+    namespace: ${PROJECT_NAME}
+  roleRef:
+    apiGroup: rbac.authorization.k8s.io
+    kind: ClusterRole
+    name: admin
+  subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: User
+    name: ${PROJECT_ADMIN_USER}
+parameters:
+- name: PROJECT_NAME
+- name: PROJECT_DISPLAYNAME
+- name: PROJECT_DESCRIPTION
+- name: PROJECT_ADMIN_USER
+- name: PROJECT_REQUESTING_USER

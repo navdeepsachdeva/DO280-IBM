@@ -1,0 +1,25 @@
+apiVersion: quota.openshift.io/v1
+kind: ClusterResourceQuota
+metadata:
+  creationTimestamp: null
+  name: ron-quota
+spec:
+  quota:
+    hard:
+      count/configmaps: "4"
+      count/deployments.apps: "3"
+      count/pods: "6"
+      count/routes.route.openshift.io: "2"
+      count/secrets: "4"
+      count/services: "3"
+  selector:
+    annotations:
+      openshift.io/requester: ron
+    labels:
+      matchLabels:
+        env: test
+status:
+  namespaces: null
+  total: {}
+
+# oc create clusterresourcequota ron-quota --hard count/pods=6,count/services=3,count/deployments.apps=3,count/routes.route.openshift.io=2,count/secrets=4,count/configmaps=4 --project-annotation-selector=openshift.io/requester=ron --project-label-selector=env=test --dry-run=client -o yaml > ron-quota.yml

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  creationTimestamp: null
+  name: count-quota
+spec:
+  hard:
+    count/configmaps: "4"
+    count/deployments.apps: "3"
+    count/pods: "6"
+    count/routes.route.openshift.io: "2"
+    count/secrets: "4"
+    count/services: "3"
+status: {}
+# oc create quota count-quota --hard count/pods=6,count/services=3,count/deployments.apps=3,count/routes.route.openshift.io=2,count/secrets=4,count/configmaps=4 --dry-run=client -o yaml > count-quota.yml
